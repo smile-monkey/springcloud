@@ -68,7 +68,7 @@ public class TestMQProvider {
 
     @RequestMapping("/testDelayMQPlugin")
     public void testDelayQueuePlugin() {
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 5; i++) {
             MessagePostProcessor processor = (message) -> {
                 message.getMessageProperties().setDelay(5000);
                 return message;
@@ -82,7 +82,7 @@ public class TestMQProvider {
         // 再放入3个时间较短的消息到延迟队列
         for (int i = 0; i < 3; i++) {
             MessagePostProcessor processor = (message) -> {
-                message.getMessageProperties().setExpiration(1000 + "");
+                message.getMessageProperties().setDelay(1000);
                 return message;
             };
             Order dto = new Order("SH00" + i, new Date());

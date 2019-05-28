@@ -3,6 +3,7 @@ package com.technology.demo;
 import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -65,10 +66,11 @@ public class MQConfig {
     public static final String DELAY_PLUGIN_MESSAGE_QUEUE = "delayPluginMessageQueue";
 
     @Bean
-    public Exchange delayPluginExchange() {
+    public CustomExchange delayPluginExchange() {
         Map<String, Object> args = new HashMap<>();
         args.put("x-delayed-type", "direct");
-        return ExchangeBuilder.directExchange(DELAY_PLUGIN_EXCHENGE).durable(true).withArguments(args).build();
+        return new CustomExchange(DELAY_PLUGIN_EXCHENGE, "x-delayed-message", true, false, args);
+//        return (DirectExchange)ExchangeBuilder.directExchange(DELAY_PLUGIN_EXCHENGE).durable(true).withArguments(args).build();
     }
     @Bean
     public Queue delayPluginMessageQueue() {
@@ -76,8 +78,8 @@ public class MQConfig {
     }
     @Bean
     @Resource
-    public Binding delayPluginExchangeBindingDelayPluginMessageQueue(DirectExchange delayPluginExchange, Queue delayPluginMessageQueue) {
-        return BindingBuilder.bind(delayPluginMessageQueue).to(delayPluginExchange).withQueueName();
+    public Binding delayPluginExchangeBindingDelayPluginMessageQueue() {
+        return BindingBuilder.bind(delayPluginMessageQueue()).to(delayPluginExchange()).with(DELAY_PLUGIN_MESSAGE_QUEUE).noargs();
     }
 
 }
