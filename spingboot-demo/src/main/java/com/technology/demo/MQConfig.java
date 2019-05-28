@@ -1,9 +1,6 @@
 package com.technology.demo;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -60,4 +57,27 @@ public class MQConfig {
     public Binding commonTaskExchangeBindingOrderSysOvertimeTaskQueue(DirectExchange commonTaskExchange, Queue orderSysOvertimeTaskQueue) {
         return BindingBuilder.bind(orderSysOvertimeTaskQueue).to(commonTaskExchange).withQueueName();
     }
+
+
+
+
+    public static final String DELAY_PLUGIN_EXCHENGE = "delayPluginExchange";
+    public static final String DELAY_PLUGIN_MESSAGE_QUEUE = "delayPluginMessageQueue";
+
+    @Bean
+    public Exchange delayPluginExchange() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-delayed-type", "direct");
+        return ExchangeBuilder.directExchange(DELAY_PLUGIN_EXCHENGE).durable(true).withArguments(args).build();
+    }
+    @Bean
+    public Queue delayPluginMessageQueue() {
+        return new Queue(DELAY_PLUGIN_MESSAGE_QUEUE, true, false, false);
+    }
+    @Bean
+    @Resource
+    public Binding delayPluginExchangeBindingDelayPluginMessageQueue(DirectExchange delayPluginExchange, Queue delayPluginMessageQueue) {
+        return BindingBuilder.bind(delayPluginMessageQueue).to(delayPluginExchange).withQueueName();
+    }
+
 }
